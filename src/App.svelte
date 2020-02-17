@@ -1,30 +1,45 @@
 <script>
-	export let name;
+	import Actions from './Actions.svelte'
+	import CatWrapper from './cheats/CatWrapper.svelte'
+
+	import { get, like, dislike } from './cheats/api'
+
+	let isLoading = false
+	let cat
+
+	const fetchCat = async () => {
+		isLoading = true
+		cat = await get()
+		isLoading = false
+	}
+
+	const likeCat = () => {
+		like(cat.id)
+		fetchCat()
+	}
+
+	const dislikeCat = () => {
+		dislike(cat.id)
+		fetchCat()
+	}
+
+	fetchCat()
 </script>
 
 <main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
+	<CatWrapper>
+		{#if cat}
+			<img src={cat.url} alt={`Picture of cat ${cat.id}`} />
+		{/if}
+	</CatWrapper>
+	<Actions on:like={likeCat} on:dislike={dislikeCat} disabled={isLoading} />
 </main>
 
 <style>
 	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-	}
-
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
+		display: flex;
+		flex-direction: column;
+		height: 100vh;
+		width: 100vw;
 	}
 </style>
